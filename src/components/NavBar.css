@@ -1,0 +1,194 @@
+/* Sticky header */
+.nav-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in oklab, var(--surface), transparent 10%);
+  -webkit-backdrop-filter: saturate(180%) blur(8px);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand), transparent 75%);
+}
+
+/* Desktop nav links */
+.nav-links {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .nav-links { display: flex; }
+}
+
+.nav-item { position: relative; }
+
+.nav-trigger {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font: inherit;
+  cursor: pointer;
+}
+.nav-item.active .nav-trigger, .nav-trigger:hover, .nav-trigger:focus-visible {
+  background: color-mix(in oklab, var(--brand), transparent 85%);
+}
+
+/* Mega panel */
+.mega-panel {
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(100% + 8px);
+  min-width: 540px;
+  padding: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 200ms ease;
+}
+.nav-item.active .mega-panel {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.mega-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mega-item a {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.mega-item a:hover, .mega-item a:focus-visible {
+  background: color-mix(in oklab, var(--brand), transparent 88%);
+}
+.icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: var(--brand-strong);
+}
+.mega-text { display: grid; line-height: 1.1; }
+.mega-title { font-weight: 700; }
+.mega-desc { color: var(--text-muted); font-size: 0.85rem; }
+
+/* Search */
+.nav-search {
+  margin-inline-start: auto;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.nav-search input {
+  background: transparent;
+  border: 0;
+  outline: none;
+  min-width: 200px;
+  color: inherit;
+}
+@media (min-width: 768px) {
+  .nav-search { display: inline-flex; }
+}
+
+/* Burger */
+.nav-burger {
+  margin-inline-start: auto;
+  display: inline-flex;
+  background: transparent;
+  border: 0;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+  color: inherit;
+}
+@media (min-width: 768px) {
+  .nav-burger { display: none; }
+}
+
+/* Mobile drawer */
+.mobile-drawer {
+  display: none;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.nav-header.open .mobile-drawer { display: block; }
+.mobile-groups { padding: 0.5rem 1rem 1rem; }
+
+.mobile-groups details {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  background: color-mix(in oklab, var(--surface), transparent 6%);
+}
+.mobile-groups summary {
+  list-style: none;
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+.mobile-groups summary::-webkit-details-marker { display: none; }
+
+.mobile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0.5rem 0.75rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.mobile-list a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.mobile-list a:hover { background: color-mix(in oklab, var(--brand), transparent 88%); }

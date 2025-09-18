@@ -42,6 +42,32 @@
 .section h2 { margin: 0 0 0.25rem; font-size: 1.4rem; }
 .section p { margin: 0 0 0.5rem; }
 
+/* Dashboard visuals */
+.dashboard-wrap { margin-top: 0.5rem; }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+@media (min-width: 800px) {
+  .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1100px) {
+  .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.viz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.viz-head { padding: 0.6rem 0.8rem 0.2rem; }
+.viz-head h3 { margin: 0; font-size: 1.05rem; }
+.viz-head .muted { margin: 0.2rem 0 0; font-size: 0.85rem; }
+.viz-body { height: 280px; padding: 0.25rem 0.25rem 0.5rem; }
+
 .cta {
   display: inline-block;
   margin-top: 0.25rem;
@@ -61,3 +87,63 @@
   text-align: center;
   background: color-mix(in oklab, var(--surface), transparent 5%);
 }
+
+/* Interactive widgets */
+.widget-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  box-shadow: var(--shadow);
+  margin: 0.5rem 0;
+}
+.widget-card h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.widget-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin: 0.25rem 0 0.5rem;
+}
+@media (min-width: 720px) {
+  .widget-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.widget-card label { display: grid; gap: 0.25rem; font-weight: 600; }
+.widget-card input[type="number"],
+.widget-card input[type="text"],
+.widget-card input[type="search"],
+.widget-card select,
+.widget-card input[type="range"] {
+  background: var(--surface);
+  color: inherit;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.6rem;
+}
+.widget-card input[type="range"] { padding: 0; }
+.row { display: inline-flex; align-items: center; gap: 0.5rem; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--surface), transparent 0%);
+  cursor: pointer;
+}
+.pill.todo { background: color-mix(in oklab, var(--brand), transparent 90%); }
+.pill.doing { background: color-mix(in oklab, #f59e0b, transparent 85%); }
+.pill.done { background: color-mix(in oklab, #22c55e, transparent 80%); }
+
+.checklist, .events { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.checklist .row.done span { text-decoration: line-through; color: var(--text-muted); }
+.event { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.45rem 0.2rem; }
+.event-main { display: grid; }
+
+.widget-chart { margin-top: 0.5rem; }
+
+/* Recharts global overrides for readability */
+.recharts-default-tooltip { color: var(--text) !important; }
+.recharts-tooltip-label { color: var(--text) !important; }
+.recharts-legend-item-text { color: var(--text) !important; }

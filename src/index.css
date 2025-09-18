@@ -12,6 +12,10 @@
   --hover: rgba(2, 6, 23, 0.04); /* neutral hover */
   --shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
 
+  /* Aliases for compatibility */
+  --accent: var(--brand);
+  --muted-fg: var(--text-muted);
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -37,6 +41,10 @@
     --ring: rgba(34, 197, 94, 0.35);
     --hover: rgba(255, 255, 255, 0.06);
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+    /* Aliases for compatibility */
+    --accent: var(--brand);
+    --muted-fg: var(--text-muted);
   }
 }
 

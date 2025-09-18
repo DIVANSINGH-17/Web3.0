@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './NavBar.css'
 
 // Tiny inline SVG icons to avoid extra deps
@@ -28,36 +28,22 @@ const Icon = ({ name }) => {
     close: (
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.3 5.71L12 12l6.3 6.29l-1.41 1.42L10.59 13.4L4.29 19.7L2.88 18.3L9.18 12L2.88 5.71L4.29 4.29l6.3 6.3l6.29-6.3z"/></svg>
     ),
+    dashboard: (
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3V3Zm10 0h8v5h-8V3ZM3 13h5v8H3v-8Zm7 0h11v8H10v-8Z"/></svg>
+    ),
   }
   return <span className="icon" aria-hidden="true">{icons[name]}</span>
 }
 
 const NAV = [
   {
-    label: 'Learn',
-    key: 'learn',
-    items: [
-      { icon: 'carbon', title: 'Carbon Footprint', desc: 'Understand emissions', href: '#carbon' },
-      { icon: 'water', title: 'Water Use', desc: 'Track consumption', href: '#water' },
-      { icon: 'waste', title: 'Waste', desc: 'Reduce & recycle', href: '#waste' },
-    ],
-  },
-  {
     label: 'Track',
     key: 'track',
     items: [
-      { icon: 'tips', title: 'Daily Habits', desc: 'Simple wins', href: '#habits' },
-      { icon: 'carbon', title: 'Commute', desc: 'Travel impact', href: '#commute' },
-      { icon: 'water', title: 'Home Water', desc: 'Smart savings', href: '#home-water' },
-    ],
-  },
-  {
-    label: 'Community',
-    key: 'community',
-    items: [
-      { icon: 'community', title: 'Local Groups', desc: 'Join & act', href: '#community' },
-      { icon: 'tips', title: 'Challenges', desc: 'Friendly goals', href: '#challenges' },
-      { icon: 'waste', title: 'Cleanups', desc: 'Events near you', href: '#cleanups' },
+      { icon: 'dashboard', title: 'Dashboard', desc: 'Live charts & data', href: '#dashboard' },
+      { icon: 'tips', title: 'Daily Habits', desc: 'Simple daily wins', href: '#habits' },
+      { icon: 'carbon', title: 'Commute Calculator', desc: 'Travel impact', href: '#commute' },
+      { icon: 'water', title: 'Home Water Savings', desc: 'Smart water use', href: '#home-water' },
     ],
   },
 ]
@@ -66,6 +52,8 @@ export default function NavBar({ query, onQueryChange }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openKey, setOpenKey] = useState(null)
   const navRef = useRef(null)
+  const [isDesktop, setIsDesktop] = useState(true)
+  const hoverTimeoutRef = useRef(null)
 
   const onOutsideClick = (e) => {
     if (!navRef.current) return
@@ -79,20 +67,60 @@ export default function NavBar({ query, onQueryChange }) {
     return () => document.removeEventListener('click', onOutsideClick)
   }, [])
 
-  const isDesktop = useMemo(() => {
-    if (typeof window === 'undefined') return true
-    return window.matchMedia('(min-width: 768px)').matches
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    setIsDesktop(mediaQuery.matches)
+
+    const handleChange = (e) => setIsDesktop(e.matches)
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
+  // Clear any existing timeout
+  const clearHoverTimeout = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+      hoverTimeoutRef.current = null
+    }
+  }
+
   const toggleDropdown = (key) => {
+    clearHoverTimeout()
     setOpenKey((prev) => (prev === key ? null : key))
   }
 
   const handleNavItemEnter = (key) => {
-    if (isDesktop) setOpenKey(key)
+    if (isDesktop) {
+      clearHoverTimeout()
+      setOpenKey(key)
+    }
   }
+
   const handleNavItemLeave = (key) => {
-    if (isDesktop) setOpenKey((prev) => (prev === key ? null : prev))
+    if (isDesktop) {
+      clearHoverTimeout()
+      hoverTimeoutRef.current = setTimeout(() => {
+        setOpenKey((prev) => (prev === key ? null : prev))
+      }, 300)
+    }
+  }
+
+  const handlePanelEnter = () => {
+    if (isDesktop) {
+      clearHoverTimeout()
+    }
+  }
+
+  const handlePanelLeave = (key) => {
+    if (isDesktop) {
+      clearHoverTimeout()
+      hoverTimeoutRef.current = setTimeout(() => {
+        setOpenKey((prev) => (prev === key ? null : prev))
+      }, 300)
+    }
   }
 
   const submitSearch = (e) => {
@@ -112,7 +140,7 @@ export default function NavBar({ query, onQueryChange }) {
   return (
     <header ref={navRef} className={`nav-header ${mobileOpen ? 'open' : ''}`}>
       <div className="nav-inner">
-        <a className="brand" href="#root" aria-label="Earth Balance Tracker home">
+        <a className="brand" href="#top" aria-label="Earth Balance Tracker home">
           <span className="brand-dot" />
           Earth Balance
         </a>
@@ -137,6 +165,8 @@ export default function NavBar({ query, onQueryChange }) {
                 id={`panel-${group.key}`}
                 role="region"
                 className="mega-panel"
+                onMouseEnter={() => handlePanelEnter()}
+                onMouseLeave={() => handlePanelLeave(group.key)}
               >
                 <ul className="mega-grid">
                   {group.items.map((it) => (

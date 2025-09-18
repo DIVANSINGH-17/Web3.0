@@ -1,17 +1,14 @@
 import { useMemo, useState } from 'react'
 import './App.css'
 import NavBar from './components/NavBar'
+import DataDashboard from './components/DataDashboard'
+import { CommuteCalculator, HomeWaterSavings, HabitsTracker } from './components/SectionWidgets'
 
 const SECTIONS = [
-  { id: 'carbon', title: 'Carbon Footprint', content: 'Understand emissions from travel, energy use, and food choices. Learn where your biggest impacts are and how to shrink them.' },
-  { id: 'water', title: 'Water Use', content: 'Track your daily water consumption at home and outdoors. Discover easy ways to save water without sacrificing comfort.' },
-  { id: 'waste', title: 'Waste', content: 'Reduce, reuse, and recycle with confidence. See how your household waste impacts the planet and how to cut it down.' },
+  { id: 'dashboard', title: 'Dashboard', content: 'Live data visualizations for water, carbon, and waste from EPA and USGS APIs.' },
   { id: 'habits', title: 'Daily Habits', content: 'Small actions add up. Build momentum with simple, repeatable wins you can adopt right now.' },
-  { id: 'commute', title: 'Commute', content: 'Measure the impact of your daily travel. Compare options like walking, cycling, transit, and EV driving.' },
-  { id: 'home-water', title: 'Home Water', content: 'Find and fix hidden water waste—from leaky taps to inefficient fixtures—to lower your bill and footprint.' },
-  { id: 'community', title: 'Local Groups', content: 'Join nearby sustainability groups to learn, act, and stay motivated with others on the same journey.' },
-  { id: 'challenges', title: 'Challenges', content: 'Stay engaged with weekly goals and friendly challenges that reward consistent, positive habits.' },
-  { id: 'cleanups', title: 'Cleanups', content: 'Find cleanup events near you and make a direct impact in your community.' },
+  { id: 'commute', title: 'Commute Calculator', content: 'Calculate the carbon impact of your daily travel. Compare walking, cycling, transit, and driving options.' },
+  { id: 'home-water', title: 'Home Water Savings', content: 'Find and fix hidden water waste—from leaky taps to inefficient fixtures—to lower your bill and footprint.' },
 ]
 
 function App() {
@@ -23,15 +20,33 @@ function App() {
     return SECTIONS.filter((s) => (s.title + ' ' + s.content).toLowerCase().includes(q))
   }, [query])
 
+  const renderWidget = (id) => {
+    switch (id) {
+      case 'commute': return <CommuteCalculator />
+      case 'home-water': return <HomeWaterSavings />
+      case 'habits': return <HabitsTracker />
+      default: return null
+    }
+  }
+
   return (
     <>
       <NavBar query={query} onQueryChange={setQuery} />
 
       <main className="container">
-        <header className="hero">
+        <header id="top" className="hero">
           <h1>Earth Balance Tracker</h1>
           <p className="muted">Know your impact. Take action with confidence.</p>
         </header>
+
+        {/* Dashboard section */}
+        <section id="dashboard" data-section="" data-title="Dashboard" className="section">
+          <h2>Data Visualizations</h2>
+          <p className="muted">Live USGS water data plus mock carbon and waste insights.</p>
+          <div className="dashboard-wrap">
+            <DataDashboard />
+          </div>
+        </section>
 
         <div className="results-bar">
           {query
@@ -39,11 +54,12 @@ function App() {
             : 'Explore key areas to balance your footprint'}
         </div>
 
-        {filtered.map((s) => (
+        {filtered.filter(s => s.id !== 'dashboard').map((s) => (
           <section key={s.id} id={s.id} data-section="" data-title={s.title} className="section">
             <h2>{s.title}</h2>
             <p>{s.content}</p>
-            <a className="cta" href="#root">Back to top</a>
+            {renderWidget(s.id)}
+            <a className="cta" href="#top">Back to top</a>
           </section>
         ))}
 

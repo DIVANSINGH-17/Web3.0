@@ -56,6 +56,10 @@
   .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
+/* Allow featured viz to span wider/taller */
+.viz-card.wide { grid-column: 1 / -1; }
+.viz-card.tall .viz-body { height: 420px; }
+
 .viz-card {
   background: var(--surface);
   border: 1px solid var(--border);

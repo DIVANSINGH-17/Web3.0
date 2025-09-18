@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import useLocalStorage from './useLocalStorage'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RTooltip, CartesianGrid, Legend, PieChart, Pie, Cell } from 'recharts'
+import EcoChallenge from './EcoChallenge'
 
 // Colors aligned with theme
 const COLORS = ['#22c55e', '#16a34a', '#84cc16', '#0ea5e9', '#f59e0b']
@@ -398,8 +399,15 @@ export function HabitsTracker() {
   const completionRate = totalHabits > 0 ? Math.round((completedToday / totalHabits) * 100) : 0
 
   const groupedHabits = habits.reduce((acc, habit) => {
-    if (!acc[habit.category]) acc[habit.category] = []
-    acc[habit.category].push(habit)
+    const cat = habit.category || 'Other'
+    const safe = {
+      ...habit,
+      name: habit.name || 'Habit',
+      impact: habit.impact || 'Positive impact',
+      category: cat,
+    }
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(safe)
     return acc
   }, {})
 
@@ -445,7 +453,7 @@ export function HabitsTracker() {
                       style={{ marginRight: '0.5rem' }}
                     />
                     <div>
-                      <span style={{ fontWeight: h.done ? '400' : '500' }}>{h.name}</span>
+                      <span style={{ fontWeight: h.done ? '400' : '500' }}>{h.name || 'Habit'}</span>
                       {h.streak > 0 && (
                         <span style={{
                           marginLeft: '0.5rem',
@@ -457,7 +465,7 @@ export function HabitsTracker() {
                         </span>
                       )}
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-                        {h.impact}
+                        {h.impact || 'Positive impact'}
                       </div>
                     </div>
                   </label>
@@ -550,6 +558,11 @@ export function HabitsTracker() {
           </div>
         </div>
       )}
+
+      {/* Gamified mini‑challenge */}
+      <div style={{ marginTop: '1rem' }}>
+        <EcoChallenge />
+      </div>
     </div>
   )
 }

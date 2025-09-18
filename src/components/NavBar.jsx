@@ -141,6 +141,7 @@ export default function NavBar({ query, onQueryChange }) {
     <header ref={navRef} className={`nav-header ${mobileOpen ? 'open' : ''}`}>
       <div className="nav-inner">
         <a className="brand" href="#top" aria-label="Earth Balance Tracker home">
+          <img src="/src/assets/logo.png" alt="Earth Balance logo" width="20" height="20" style={{ borderRadius: '4px' }} />
           <span className="brand-dot" />
           Earth Balance
         </a>

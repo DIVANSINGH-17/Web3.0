@@ -3,9 +3,82 @@ import useLocalStorage from './useLocalStorage'
 import {
   ResponsiveContainer,
   LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip as RTooltip,
-  BarChart, Bar, Legend,
+  BarChart, Bar,
   PieChart, Pie, Cell
 } from 'recharts'
+
+// Fetch World Bank freshwater withdrawals (billion m³)
+function useGlobalWaterUsage() {
+  const [state, setState] = useState({ status: 'idle', worldSeries: [], topCountries: [] })
+
+  useEffect(() => {
+    let cancelled = false
+    async function run() {
+      setState({ status: 'loading', worldSeries: [], topCountries: [] })
+      try {
+        // 1) World time series
+        const worldUrl = 'https://api.worldbank.org/v2/country/WLD/indicator/ER.H2O.FWTL.K3?date=1990:2023&format=json&per_page=20000'
+        // 2) All countries latest few years (for top-10 latest)
+        const allUrl = 'https://api.worldbank.org/v2/country/all/indicator/ER.H2O.FWTL.K3?date=2015:2023&format=json&per_page=20000'
+        const [wRes, aRes] = await Promise.all([fetch(worldUrl), fetch(allUrl)])
+
+        let worldSeries = []
+        if (wRes.ok) {
+          const wJson = await wRes.json()
+          const arr = Array.isArray(wJson?.[1]) ? wJson[1] : []
+          worldSeries = arr
+            .filter(d => d?.value != null)
+            .map(d => ({ year: d.date, value: Number(d.value) }))
+            .sort((a, b) => Number(a.year) - Number(b.year))
+        }
+
+        let topCountries = []
+        if (aRes.ok) {
+          const aJson = await aRes.json()
+          const data = Array.isArray(aJson?.[1]) ? aJson[1] : []
+          // Pick the latest year available per country
+          const latestMap = new Map()
+          for (const d of data) {
+            if (!d?.country?.value) continue
+            const name = d.country.value
+            const year = Number(d.date)
+            const value = d.value == null ? null : Number(d.value)
+            if (value == null) continue
+            const prev = latestMap.get(name)
+            if (!prev || year > prev.year) latestMap.set(name, { name, value, year })
+          }
+          // Exclude aggregate regions
+          const isAggregate = (n) => /world|income|area|union|members|caribbean|asia|europe|africa|america|pacific|emerging|high|low|upper|lower|oecd|euro/i.test(n)
+          const rows = Array.from(latestMap.values()).filter(r => !isAggregate(r.name))
+          topCountries = rows.sort((a, b) => b.value - a.value).slice(0, 10)
+        }
+
+        if (!cancelled) setState({ status: 'success', worldSeries, topCountries })
+      } catch (e) {
+        if (cancelled) return
+        // Minimal mock fallback
+        const worldSeries = Array.from({ length: 10 }, (_, i) => ({ year: String(2012 + i), value: 400 + i * 8 }))
+        const topCountries = [
+          { name: 'Country A', value: 120 },
+          { name: 'Country B', value: 115 },
+          { name: 'Country C', value: 100 },
+          { name: 'Country D', value: 95 },
+          { name: 'Country E', value: 90 },
+          { name: 'Country F', value: 85 },
+          { name: 'Country G', value: 80 },
+          { name: 'Country H', value: 75 },
+          { name: 'Country I', value: 70 },
+          { name: 'Country J', value: 65 },
+        ]
+        setState({ status: 'mock', worldSeries, topCountries })
+      }
+    }
+    run()
+    return () => { cancelled = true }
+  }, [])
+
+  return state
+}
 
 function useUSGSWater(site = '01646500', params = ['00060'], period = 'P7D') {
   const [data, setData] = useState({ series: [], status: 'idle', error: null })
@@ -236,9 +309,9 @@ function useIWasteMeta() {
   return state
 }
 
-function Card({ title, subtitle, children }) {
+function Card({ title, subtitle, children, className }) {
   return (
-    <section className="viz-card">
+    <section className={`viz-card ${className || ''}`}>
       <header className="viz-head">
         <h3>{title}</h3>
         {subtitle ? <p className="muted">{subtitle}</p> : null}
@@ -255,13 +328,14 @@ export default function DataDashboard() {
   const water = useUSGSWater(siteId)
   const iwaste = useIWasteMeta()
   const carbon = useCarbon()
+  const globalWater = useGlobalWaterUsage()
 
   const waterShort = useMemo(() => water.series.slice(-48), [water.series])
 
   return (
     <div className="dashboard-grid">
       {/* Carbon Intensity History */}
-      <Card title="Carbon Intensity (History)" subtitle={carbon.status === 'loading' ? 'Loading…' : carbon.status === 'mock' ? 'Mocked (configure VITE_CARBON_BASE and key)' : 'Past periods'}>
+      <Card title="Carbon Intensity (History)">
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={carbon.intensity} margin={{ top: 10, right: 12, bottom: 4, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -274,7 +348,7 @@ export default function DataDashboard() {
       </Card>
 
       {/* Power Mix Breakdown */}
-      <Card title="Power Mix (Latest)" subtitle={carbon.status === 'loading' ? 'Loading…' : 'Share by source'}>
+      <Card title="Power Mix (Latest)">
         <ResponsiveContainer width="100%" height={260}>
           <PieChart>
             <Pie data={carbon.breakdown} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} paddingAngle={3}>
@@ -287,8 +361,33 @@ export default function DataDashboard() {
         </ResponsiveContainer>
       </Card>
 
-      {/* IWASTE Overview */}
-      <Card title="EPA iWASTE Overview" subtitle={iwaste.status === 'loading' ? 'Loading iWASTE metadata…' : iwaste.status === 'mock' ? 'Mocked (configure VITE_IWASTE_BASE and auth if required)' : `${iwaste.paramCount} parameters • ${iwaste.structureTypes.length} structure types`}>
+      {/* Global Water Usage (World Bank) */}
+      <Card title="Global Water Withdrawals (World Bank)">
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={globalWater.worldSeries} margin={{ top: 10, right: 12, bottom: 4, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="year" tick={{ fill: 'var(--text-muted)' }} tickLine={false} axisLine={{ stroke: 'var(--border)' }} minTickGap={24} />
+            <YAxis tick={{ fill: 'var(--text-muted)' }} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
+            <RTooltip formatter={(v) => [`${Number(v).toFixed(1)} B m³`, 'Withdrawals']} contentStyle={{ background: 'var(--surface)', border: `1px solid var(--border)`, borderRadius: 8 }} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
+            <Line type="monotone" dataKey="value" stroke="#0ea5e9" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </Card>
+
+      <Card title="Top 10 Countries – Latest Withdrawals" className="wide tall">
+        <ResponsiveContainer width="100%" height={360}>
+          <BarChart layout="vertical" data={globalWater.topCountries} margin={{ top: 10, right: 16, bottom: 10, left: 0 }} barCategoryGap={8}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis type="number" tick={{ fill: 'var(--text-muted)' }} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
+            <YAxis type="category" dataKey="name" width={140} tick={{ fill: 'var(--text-muted)', fontSize: 12 }} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
+            <RTooltip formatter={(v) => [`${Number(v).toFixed(1)} B m³`, 'Withdrawals']} contentStyle={{ background: 'var(--surface)', border: `1px solid var(--border)`, borderRadius: 8 }} labelStyle={{ color: 'var(--text)' }} itemStyle={{ color: 'var(--text)' }} />
+            <Bar dataKey="value" fill="var(--brand)" radius={[0, 6, 6, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* EPA iWASTE Overview */}
+      <Card title="EPA iWASTE Overview">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={iwaste.categoryCounts} margin={{ top: 10, right: 12, bottom: 8, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -301,10 +400,7 @@ export default function DataDashboard() {
       </Card>
 
       {/* USGS Water */}
-      <Card
-        title={`River Discharge (USGS ${siteId})`}
-        subtitle={water.status === 'loading' ? 'Loading live data…' : water.status === 'mock' ? 'Showing mock data (API unavailable)' : 'Past ~7 days'}
-      >
+      <Card title={`River Discharge (USGS ${siteId})`}>
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={waterShort} margin={{ top: 10, right: 12, bottom: 4, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />

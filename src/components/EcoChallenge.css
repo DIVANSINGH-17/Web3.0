@@ -1,0 +1,91 @@
+/* EcoChallenge mini-game styles */
+.eco-quest {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+.eco-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.eco-head h4 { margin: 0; font-size: 1rem; }
+.eco-head .link {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  padding: 0.25rem 0.5rem;
+}
+
+.eco-progress {
+  position: relative;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+.eco-progress .bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-strong));
+}
+.eco-progress .meta {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.eco-actions { margin-top: 0.75rem; }
+.eco-card {
+  margin-top: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 0.6rem;
+  padding: 0.6rem;
+}
+.eco-card .pill {
+  display: inline-block;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--brand), transparent 85%);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+.eco-card .sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+.eco-card .buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.eco-card .buttons .primary { background: var(--brand); color: #fff; }
+
+/* Optional theme tints per category */
+.pill.water { background: color-mix(in oklab, #0ea5e9, transparent 82%); }
+.pill.waste { background: color-mix(in oklab, #f59e0b, transparent 85%); }
+.pill.transport { background: color-mix(in oklab, #22c55e, transparent 85%); }
+.pill.energy { background: color-mix(in oklab, #a78bfa, transparent 85%); }
+.pill.food { background: color-mix(in oklab, #ef4444, transparent 88%); }
+.pill.community { background: color-mix(in oklab, #06b6d4, transparent 85%); }
+
+.eco-history { margin-top: 0.6rem; }
+.eco-history .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.25rem; }
+.eco-history .tag {
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.8rem;
+}
+
+.flash {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--brand), transparent 85%);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+

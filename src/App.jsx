@@ -34,8 +34,8 @@ function App() {
       <NavBar query={query} onQueryChange={setQuery} />
 
       <main className="container">
-        <header id="top" className="hero">
-          <h1>Earth Balance Tracker</h1>
+        <header className="hero">
+          <h1>GreenPulse</h1>
           <p className="muted">Know your impact. Take action with confidence.</p>
         </header>
 
@@ -59,7 +59,7 @@ function App() {
             <h2>{s.title}</h2>
             <p>{s.content}</p>
             {renderWidget(s.id)}
-            <a className="cta" href="#top">Back to top</a>
+            <a className="cta" href="#dashboard">Back to dashboard</a>
           </section>
         ))}
 
@@ -69,7 +69,7 @@ function App() {
       </main>
 
       <footer className="site-footer">
-        <p className="muted">© {new Date().getFullYear()} Earth Balance. Built with Vite + React.</p>
+        <p className="muted">© {new Date().getFullYear()} GreenPulse. Built with Vite + React.</p>
       </footer>
     </>
   )

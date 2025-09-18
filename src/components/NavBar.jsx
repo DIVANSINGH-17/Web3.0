@@ -54,6 +54,7 @@ export default function NavBar({ query, onQueryChange }) {
   const navRef = useRef(null)
   const [isDesktop, setIsDesktop] = useState(true)
   const hoverTimeoutRef = useRef(null)
+  const [ecoPoints, setEcoPoints] = useState(0)
 
   const onOutsideClick = (e) => {
     if (!navRef.current) return
@@ -77,6 +78,27 @@ export default function NavBar({ query, onQueryChange }) {
     mediaQuery.addEventListener('change', handleChange)
 
     return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  // Initialize eco points from localStorage and subscribe to updates
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const todayKey = new Date().toISOString().slice(0, 10)
+      const raw = localStorage.getItem('eco.quest')
+      if (raw) {
+        const obj = JSON.parse(raw)
+        const pts = obj?.[todayKey]?.points || 0
+        setEcoPoints(pts)
+      }
+    } catch {}
+
+    const handler = (e) => {
+      const pts = e?.detail?.points || 0
+      setEcoPoints(pts)
+    }
+    window.addEventListener('eco-points-changed', handler)
+    return () => window.removeEventListener('eco-points-changed', handler)
   }, [])
 
   // Clear any existing timeout
@@ -140,11 +162,14 @@ export default function NavBar({ query, onQueryChange }) {
   return (
     <header ref={navRef} className={`nav-header ${mobileOpen ? 'open' : ''}`}>
       <div className="nav-inner">
-        <a className="brand" href="#top" aria-label="Earth Balance Tracker home">
-          <img src="/src/assets/logo.png" alt="Earth Balance logo" width="20" height="20" style={{ borderRadius: '4px' }} />
+        <a className="brand" href="#dashboard" aria-label="GreenPulse home">
+          <img src="/src/assets/logo.png" alt="GreenPulse logo" className="brand-logo" />
           <span className="brand-dot" />
-          Earth Balance
+          GreenPulse
         </a>
+
+        {/* Live eco points */}
+        <div className="nav-points" aria-label={`Eco points ${ecoPoints}`}>🌿 {ecoPoints}</div>
 
         <nav className="nav-links" aria-label="Primary">
           {NAV.map((group) => (

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import useLocalStorage from './useLocalStorage'
 import {
   ResponsiveContainer,
   LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip as RTooltip,
@@ -101,8 +100,18 @@ function useUSGSWater(site = '01646500', params = ['00060'], period = 'P7D') {
           series = points.map(p => ({ time: p.dateTime, value: Number(p.value) }))
         }
         if (!cancelled) {
-          if (series.length > 0) setData({ series, status: 'success', error: null })
-          else throw new Error(`USGS empty`)
+          if (series.length > 0) {
+            setData({ series, status: 'success', error: null })
+          } else {
+            // Empty response fallback
+            const today = new Date()
+            const mock = Array.from({ length: 24 }, (_, i) => {
+              const d = new Date(today)
+              d.setHours(today.getHours() - (24 - i) * 7)
+              return { time: d.toISOString(), value: 100 + Math.round(30 * Math.sin(i / 3) + 15 * Math.random()) }
+            })
+            setData({ series: mock, status: 'mock', error: 'USGS empty' })
+          }
         }
       } catch (err) {
         // Fallback mock: gentle weekly pattern

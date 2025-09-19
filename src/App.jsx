@@ -41,8 +41,8 @@ function App() {
 
         {/* Dashboard section */}
         <section id="dashboard" data-section="" data-title="Dashboard" className="section">
-          <h2>Data Visualizations</h2>
-          <p className="muted">Live USGS water data plus mock carbon and waste insights.</p>
+          <h2>Earth Current Status</h2>
+
           <div className="dashboard-wrap">
             <DataDashboard />
           </div>

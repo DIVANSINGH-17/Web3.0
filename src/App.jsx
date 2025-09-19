@@ -51,7 +51,7 @@ function App() {
         <div className="results-bar">
           {query
             ? `Showing ${filtered.length} of ${SECTIONS.length} results for "${query}"`
-            : 'Explore key areas to balance your footprint'}
+            : <span className="highlight">Explore key areas to balance your footprint</span>}
         </div>
 
         {filtered.filter(s => s.id !== 'dashboard').map((s) => (

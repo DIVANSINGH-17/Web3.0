@@ -30,6 +30,15 @@
   background: var(--surface);
 }
 
+/* Inline highlight utility */
+.highlight {
+  background: color-mix(in oklab, var(--brand), transparent 88%);
+  border: 1px solid color-mix(in oklab, var(--brand), transparent 60%);
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.35rem;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand), transparent 94%) inset;
+}
+
 .section {
   scroll-margin-top: 96px;
   border: 1px solid var(--border);

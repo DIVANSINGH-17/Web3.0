@@ -164,7 +164,6 @@ export default function NavBar({ query, onQueryChange }) {
       <div className="nav-inner">
         <a className="brand" href="#dashboard" aria-label="GreenPulse home">
           <img src="/src/assets/logo.png" alt="GreenPulse logo" className="brand-logo" />
-          <span className="brand-dot" />
           GreenPulse
         </a>
 

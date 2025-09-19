@@ -27,13 +27,6 @@
   text-decoration: none;
   white-space: nowrap;
 }
-.brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--brand);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand), transparent 75%);
-}
 .brand-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; display: inline-block; }
 
 /* Desktop nav links */
